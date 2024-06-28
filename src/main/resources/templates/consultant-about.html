@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:c="http://java.sun.com/jsp/jstl/core"
+>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <title>Consultant Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <script th:inline="javascript">
+      window.history.forward();
+      function preventBack() {
+        window.history.forward();
+      }
+    </script>
+</head>
+<body
+        class="p-3 m-0 border-0 bd-example m-0 border-0 bg-dark bg-gradient bg-opacity-25 d-flex flex-row justify-content-center align-items-center vh-100"
+        onload="preventBack();"
+        onpageshow="if (Event.persisted) preventBack();"
+>
+<div
+        class="d-flex flex-row justify-content-center align-items-center h-100 w-100 mx-auto my-auto"
+>
+    <div class="container border border-2 rounded p-5 shadow-sm bg-light">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="user-info">
+                <h1>Welcome, <span th:text="${user}"></span>!</h1>
+            </div>
+            <form th:action="@{/logout}" method="post" onsubmit="return confirm('Are you sure you want to logout?');">
+                <button type="submit" class="btn btn-danger">Logout</button>
+            </form>
+        </div>
+
+        <hr class="border border-dark" />
+
+        <h1>My Appointments</h1>
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Sr no.</th>
+                <th>Student Id</th>
+                <th>Student Name</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Status</th>
+                <th>Note</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="appointment, index : ${appointments}">
+                <!-- Display student ID -->
+                <td th:text="${index.index + 1}"></td>
+                <td th:text="${appointment.studentId}"></td>
+                <!-- Find the corresponding student name -->
+                <td>
+                    <th:block th:each="student : ${students}">
+                        <th:block th:if="${student.id == appointment.studentId}">
+                            <span th:text="${student.name}"></span>
+                        </th:block>
+                    </th:block>
+                </td>
+
+                <!-- Display other appointment details -->
+                <td th:text="${#dates.format(appointment.startTime, 'dd-MM-yyyy HH:mm')}"></td>
+                <td th:text="${#dates.format(appointment.endTime, 'dd-MM-yyyy HH:mm')}"></td>
+                <td th:text="${appointment.status}"></td>
+                <td class="text-wrap" th:text="${appointment.note}"></td>
+                <td class="d-flex flex-row" th:if="${appointment.status == appointment.status.PENDING}">
+                    <!-- Buttons for actions -->
+                    <p class="d-inline-block me-2">
+                        <button class="btn btn-success">
+                            <a th:href="@{/update-appointment-accept/{id}(id=${appointment.id})}" class="text-decoration-none text-white">Accept</a>
+                        </button>
+                    </p>
+                    <p class="d-inline-block">
+                        <button class="btn btn-danger">
+                            <a th:href="@{/update-appointment-decline/{id}(id=${appointment.id})}" class="text-decoration-none text-white">Decline</a>
+                        </button>
+                    </p>
+                </td>
+                <td class="d-flex flex-row" th:if="${appointment.status != appointment.status.PENDING}">
+                    <p class="d-inline-block me-2 text-black-50" th:text="${appointment.status}">
+                        Appointment is not pending
+                    </p>
+                </td>
+            </tr>
+            </tbody>
+
+
+        </table>
+    </div>
+</div>
+</body>
+</html>
